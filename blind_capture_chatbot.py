@@ -1,11 +1,9 @@
-
 # blind_capture_chatbot.py
 # Streamlit-powered mini-bot for Payment Manager – Blind Capture
 
 import streamlit as st
 
 st.set_page_config(page_title="Blind Capture Chatbot", page_icon="💬")
-
 st.title("💬 Blind Capture Chatbot")
 
 # ---------- knowledge base ----------
@@ -51,20 +49,17 @@ Portfolios **not enabled** for Blind Capture will *not* trigger the window.
 
 def reply(user_text: str) -> str:
     txt = user_text.lower()
-    if "assign ssi" in txt:
+
+    if any(kw in txt for kw in ["assign ssi", "how do i assign", "steps for assigning", "ssi assignment"]):
         return FAQ["assign ssi"]
-    elif "trigger" in txt and "blind capture" in txt:
-        return FAQ["open blind capture"]
-    elif "when" in txt and "blind capture" in txt:
-        return FAQ["open blind capture"]
-    elif "open" in txt and "blind capture" in txt:
+    elif any(kw in txt for kw in ["trigger", "when", "open", "show", "blind capture"]):
         return FAQ["open blind capture"]
     elif "amount" in txt:
-        if "wrong" in txt or "error" in txt:
+        if "wrong" in txt or "error" in txt or "incorrect" in txt:
             return FAQ["error wrong amount"]
         return FAQ["enter amount"]
     elif "account" in txt or "iban" in txt:
-        if "wrong" in txt or "error" in txt:
+        if "wrong" in txt or "error" in txt or "incorrect" in txt:
             return FAQ["error wrong account"]
         return FAQ["enter account"]
     else:
@@ -86,6 +81,12 @@ if prompt := st.chat_input("Ask me anything about Blind Capture…"):
     st.session_state.history.append(("user", prompt))
     with st.chat_message("user"):
         st.markdown(prompt)
+
+    answer = reply(prompt)
+    st.session_state.history.append(("assistant", answer))
+    with st.chat_message("assistant"):
+        st.markdown(answer)
+
 
     answer = reply(prompt)
     st.session_state.history.append(("assistant", answer))
